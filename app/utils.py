@@ -1,84 +1,132 @@
 import streamlit as st
+import pandas as pd
+import plotly.express as px
 
-# Set page configuration
-st.set_page_config(page_title="Streamlit Basics",
-                   page_icon=":bar_chart:",
-                   layout="wide"
-                   )
+# Load the data from the xlsx file
+def load_data(uploaded_file):
+    """
+    Load data from an Excel file.
 
-# Set page title
-st.title("Streamlit Basics Tutorial")
+    Args:
+        uploaded_file (streamlit.uploaded_file_manager.UploadedFile): The uploaded Excel file.
 
-# ### Text Input
+    Returns:
+        pandas.DataFrame: The loaded data.
+    """
+    try:
+        data = pd.read_excel(uploaded_file)
+        return data
+    except Exception as e:
+        st.error("Error loading data: " + str(e))
+        return None
 
-# Create a text input field
-text_input = st.text_input("Enter your name", placeholder="Your Name")
+def display_data_preview(data):
+    """
+    Display the first few rows of the data.
 
-# Display the input text
-st.write("Hello, " + text_input + "!")
+    Args:
+        data (pandas.DataFrame): The data to display.
+    """
+    st.header("Data Preview")
+    st.write(data.head())
 
-### Slider
+def display_data_types(data):
+    """
+    Display the data types of each column.
 
-# Create a slider
-val = st.slider("Select a value", 0, 10, 0, step=1)
+    Args:
+        data (pandas.DataFrame): The data to display.
+    """
+    st.header("Data Types")
+    st.write(data.dtypes)
 
-# Display the slider value
-st.write("Slider value:", val)
+def display_summary_statistics(data):
+    """
+    Display the summary statistics of the data.
 
-### Button
+    Args:
+        data (pandas.DataFrame): The data to display.
+    """
+    st.header("Summary Statistics")
+    st.write(data.describe())
 
-# Create a button
-btn1 = st.button("Click Me")
+def display_distribution(data, column_name):
+    """
+    Display the distribution of a column.
 
-# Handle button click
-if btn1:
-    st.write("I got clicked  \U0001f604 ")
+    Args:
+        data (pandas.DataFrame): The data to display.
+        column_name (str): The name of the column to display.
+    """
+    st.header(f"Distribution of {column_name}")
+    fig = px.bar(data[column_name].value_counts())
+    st.plotly_chart(fig, use_container_width=True)
 
-### Radio Buttons
+def display_business_unit_sales(data):
+    """
+    Display the sales by business unit.
 
-# Create radio buttons
-radio_val = st.radio("Select an option", ["Option 1", "Option 2", "Option 3"])
+    Args:
+        data (pandas.DataFrame): The data to display.
+    """
+    st.header("Sales by Business Unit")
+    business_unit_sales = data.groupby('business_unit')['Jan'].sum().reset_index()
+    fig = px.bar(business_unit_sales, x='business_unit', y='Jan')
+    st.plotly_chart(fig, use_container_width=True)  
 
-# Display the selected option
-st.write("Selected option:", radio_val)
+def display_monthly_sales(data):
+    """
+    Display the monthly sales.
 
-### Checkboxes
+    Args:
+        data (pandas.DataFrame): The data to display.
+    """
+    st.header("Monthly Sales")
+    monthly_sales = data[['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']].sum().reset_index()
+    monthly_sales.columns = ['Month', 'Sales']
+    fig = px.line(monthly_sales, x='Month', y='Sales')
+    st.plotly_chart(fig, use_container_width=True)
 
-# Create checkboxes
-checkbox_val = st.checkbox("Check me")
+def eda_page(data):
+    """
+    Display the exploratory data analysis page.
 
-# Handle checkbox state
-if checkbox_val:
-    st.write("Checkbox is checked")
-else:
-    st.write("Checkbox is not checked")
+    Args:
+        data (pandas.DataFrame): The data to display.
+    """
+    st.title("Exploratory Data Analysis")
 
-### Selectbox
+    display_data_preview(data)
 
-# Create a selectbox
-selectbox_val = st.selectbox("Select a color", ["Red", "Green", "Blue"])
+    analysis_options = {
+        "Data Types": display_data_types,
+        "Summary Statistics": display_summary_statistics,
+        "Distribution": display_distribution,
+        "Business Unit Sales": display_business_unit_sales,
+        "Monthly Sales": display_monthly_sales
+    }
 
-# Display the selected color
-st.write("Selected color:", selectbox_val)
+    selected_analyses = st.multiselect("Select analyses to perform", list(analysis_options.keys()))
 
-### Multiselect
+    for analysis in selected_analyses:
+        if analysis == "Distribution":
+            column_name = st.selectbox("Select column for distribution", data.columns)
+            analysis_options[analysis](data, column_name)
+        else:
+            analysis_options[analysis](data)
 
-# Create a multiselect
-multiselect_val = st.multiselect("Select colors", ["Red", "Green", "Blue"])
+def main():
+    """
+    The main function.
+    """
+    st.title("EDA Page")
+    uploaded_file = st.file_uploader("Choose a file", type=["xlsx"])
+    if uploaded_file is not None:
+        data = load_data(uploaded_file)
+        if data is not None:
+            eda_page(data)
+    else:
+        st.info("Please upload a file to perform EDA")
 
-# Display the selected colors
-st.write("Selected colors:", multiselect_val)
-
-### Date and Time
-
-# Create a date input
-date_input = st.date_input("Select a date")
-
-# Display the selected date
-st.write("Selected date:", date_input)
-
-# Create a time input
-time_input = st.time_input("Select a time")
-
-# Display the selected time
-st.write("Selected time:", time_input)
+if __name__ == "__main__":
+    main()
