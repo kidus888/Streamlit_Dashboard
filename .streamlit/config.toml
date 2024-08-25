@@ -1,12 +1,3 @@
-
 [server]
-headless = true
-port = $PORT
-enableCORS = false
 
-[theme]
-primaryColor = "#1a73e8"
-backgroundColor = "#ffffff"
-secondaryBackgroundColor = "#f0f2f6"
-textColor = "#000000"
-font = "sans serif"
+runOnSave = true
