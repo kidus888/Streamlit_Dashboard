@@ -1,33 +1,84 @@
-# app/utils.py
-import pandas as pd
 import streamlit as st
 
-def load_data(dataset_choice):
-    if dataset_choice == "Benin":
-        data = pd.read_csv("/home/kali/Desktop/git/Streamlit_Dashboard/data/benin-malanville.csv")
-    elif dataset_choice == "Sierraleone":
-        data = pd.read_csv("/home/kali/Desktop/git/Streamlit_Dashboard/data/sierraleone-bumbuna.csv")
-    elif dataset_choice == "Togo":
-        data = pd.read_csv("/home/kali/Desktop/git/Streamlit_Dashboard/data/togo-dapaong_qc.csv")
-    else:
-        st.error("Invalid dataset choice!")
-        return None
-    return data
+# Set page configuration
+st.set_page_config(page_title="Streamlit Basics",
+                   page_icon=":bar_chart:",
+                   layout="wide"
+                   )
 
-def process_data(data, range_values):
-    # Example: Filter data based on range values
-    return data[(data['value'] >= range_values[0]) & (data['value'] <= range_values[1])]
+# Set page title
+st.title("Streamlit Basics Tutorial")
 
-def create_visualizations(data, dataset_choice):
-    st.subheader(f"Visualizations for {dataset_choice}")
-    
-    # Example: Create a simple line chart
-    st.line_chart(data)
+# ### Text Input
 
-    # Example: Add more custom visualizations based on dataset_choice
-    if dataset_choice == "Dataset 1":
-        st.bar_chart(data)
-    elif dataset_choice == "Dataset 2":
-        st.area_chart(data)
-    elif dataset_choice == "Dataset 3":
-        st.write("Additional visualizations can be added here.")
+# Create a text input field
+text_input = st.text_input("Enter your name", placeholder="Your Name")
+
+# Display the input text
+st.write("Hello, " + text_input + "!")
+
+### Slider
+
+# Create a slider
+val = st.slider("Select a value", 0, 10, 0, step=1)
+
+# Display the slider value
+st.write("Slider value:", val)
+
+### Button
+
+# Create a button
+btn1 = st.button("Click Me")
+
+# Handle button click
+if btn1:
+    st.write("I got clicked  \U0001f604 ")
+
+### Radio Buttons
+
+# Create radio buttons
+radio_val = st.radio("Select an option", ["Option 1", "Option 2", "Option 3"])
+
+# Display the selected option
+st.write("Selected option:", radio_val)
+
+### Checkboxes
+
+# Create checkboxes
+checkbox_val = st.checkbox("Check me")
+
+# Handle checkbox state
+if checkbox_val:
+    st.write("Checkbox is checked")
+else:
+    st.write("Checkbox is not checked")
+
+### Selectbox
+
+# Create a selectbox
+selectbox_val = st.selectbox("Select a color", ["Red", "Green", "Blue"])
+
+# Display the selected color
+st.write("Selected color:", selectbox_val)
+
+### Multiselect
+
+# Create a multiselect
+multiselect_val = st.multiselect("Select colors", ["Red", "Green", "Blue"])
+
+# Display the selected colors
+st.write("Selected colors:", multiselect_val)
+
+### Date and Time
+
+# Create a date input
+date_input = st.date_input("Select a date")
+
+# Display the selected date
+st.write("Selected date:", date_input)
+
+# Create a time input
+time_input = st.time_input("Select a time")
+
+# Display the selected time
+st.write("Selected time:", time_input)
